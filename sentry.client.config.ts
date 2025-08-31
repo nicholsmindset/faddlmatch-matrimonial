@@ -18,20 +18,6 @@ Sentry.init({
   // Release tracking
   release: process.env.NEXT_PUBLIC_APP_VERSION || 'unknown',
   
-  // Integration configurations
-  integrations: [
-    new Sentry.Replay({
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-    new Sentry.BrowserTracing({
-      // Set up automatic route change tracking for Next.js App Router
-      routingInstrumentation: Sentry.nextjsRouterInstrumentation({
-        usePageRoutes: false, // Using App Router
-      }),
-    }),
-  ],
-  
   // Filter out known issues
   beforeSend(event, hint) {
     // Filter out network errors and other noise
