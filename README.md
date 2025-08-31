@@ -1,6 +1,6 @@
-# Match Me App
+# FADDLmatch - Islamic Matrimonial Platform
 
-> A full-stack dating application built with Next.js 14, Prisma, NextAuth, Pusher, and Cloudinary. 
+🌟 A respectful, Islamic matrimonial platform designed for divorced and widowed Muslims seeking meaningful remarriage with family involvement and Islamic values at the center. 
 
 ## URL
 
