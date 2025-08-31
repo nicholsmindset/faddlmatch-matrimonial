@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 import { Member, Photo } from '@prisma/client';
 import { addYears } from 'date-fns';
 import { getAuthUserId } from './authActions';
@@ -35,44 +36,77 @@ export async function getMembers({
     const skip = (page - 1) * limit;
 
     try {
-        const membersSelect = {
-            where: {
-                AND: [
-                    { dateOfBirth: { gte: minDob } },
-                    { dateOfBirth: { lte: maxDob } },
-                    { gender: { in: selectedGender } },
-                    ...(withPhoto === 'true' ? [{ image: { not: null } }] : [])
-                ],
-                NOT: {
-                    userId
+        const whereClause = {
+            AND: [
+                { dateOfBirth: { gte: minDob, lte: maxDob } },
+                { gender: { in: selectedGender } },
+                ...(withPhoto === 'true' ? [{ image: { not: null } }] : [])
+            ],
+            NOT: { userId }
+        };
+
+        // Use Promise.all for parallel execution
+        const [count, members] = await Promise.all([
+            prisma.member.count({ where: whereClause }),
+            prisma.member.findMany({
+                where: whereClause,
+                orderBy: { [orderBy]: 'desc' },
+                skip,
+                take: limit,
+                select: {
+                    id: true,
+                    userId: true,
+                    name: true,
+                    image: true,
+                    gender: true,
+                    dateOfBirth: true,
+                    city: true,
+                    country: true,
+                    description: true,
+                    created: true,
+                    updated: true
                 }
-            },
-        }
-
-        const count = await prisma.member.count(membersSelect)
-
-        const members = await prisma.member.findMany({
-            ...membersSelect,
-            orderBy: { [orderBy]: 'desc' },
-            skip,
-            take: limit
-        });
+            })
+        ]);
 
         return {
             items: members,
             totalCount: count
         }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to get members', error as Error, {
+            userId,
+            ageRange,
+            gender,
+            orderBy,
+            pageNumber,
+            pageSize
+        });
         throw error;
     }
 }
 
 export async function getMemberByUserId(userId: string) {
     try {
-        return prisma.member.findUnique({ where: { userId } })
+        return await prisma.member.findUnique({ 
+            where: { userId },
+            select: {
+                id: true,
+                userId: true,
+                name: true,
+                image: true,
+                gender: true,
+                dateOfBirth: true,
+                city: true,
+                country: true,
+                description: true,
+                created: true,
+                updated: true
+            }
+        });
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to get member by userId', error as Error, { userId });
+        throw error;
     }
 }
 
@@ -98,7 +132,7 @@ export async function updateLastActive() {
             data: { updated: new Date() }
         })
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to update last active', error as Error, { userId });
         throw error;
     }
 }

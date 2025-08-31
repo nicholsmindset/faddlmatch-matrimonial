@@ -6,7 +6,7 @@ import {
 } from "@nextui-org/react";
 import Link from "next/link";
 import React from "react";
-import { GiSelfLove } from "react-icons/gi";
+import Image from "next/image";
 import NavLink from "./NavLink";
 import { auth } from "@/auth";
 import UserMenu from "./UserMenu";
@@ -39,25 +39,37 @@ export default async function TopNav() {
     <>
       <Navbar
         maxWidth="full"
-        className="bg-gradient-to-r from-pink-400 via-red-400 to-pink-600"
+        className="bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400 shadow-lg"
         classNames={{
           item: [
             "text-xl",
-            "text-white",
+            "text-gray-800",
             "uppercase",
-            "data-[active=true]:text-yellow-200",
+            "font-medium",
+            "data-[active=true]:text-amber-900",
+            "hover:text-amber-800",
           ],
         }}
       >
-        <NavbarBrand as={Link} href="/">
-          <GiSelfLove
-            size={40}
-            className="text-gray-200"
-          />
-          <div className="font-bold text-3xl flex">
-            <span className="text-gray-200">
-              MatchMe
-            </span>
+        <NavbarBrand as={Link} href="/" className="hover:opacity-90 transition-opacity">
+          <div className="flex items-center gap-3">
+            <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white p-1">
+              <Image
+                src="/faddl-logo.jpeg"
+                alt="FADDL Match Logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <div className="flex flex-col">
+              <div className="font-bold text-2xl text-gray-800">
+                FADDLmatch
+              </div>
+              <div className="text-xs text-gray-700 font-medium italic -mt-1">
+                a fresh start
+              </div>
+            </div>
           </div>
         </NavbarBrand>
         <NavbarContent justify="center">
@@ -79,15 +91,14 @@ export default async function TopNav() {
                 as={Link}
                 href="/login"
                 variant="bordered"
-                className="text-white"
+                className="text-gray-800 border-gray-800 hover:bg-gray-800 hover:text-white transition-colors"
               >
                 Login
               </Button>
               <Button
                 as={Link}
                 href="/register"
-                variant="bordered"
-                className="text-white"
+                className="bg-gray-800 text-white hover:bg-gray-700 transition-colors"
               >
                 Register
               </Button>

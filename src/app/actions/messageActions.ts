@@ -4,6 +4,7 @@ import { MessageSchema, messageSchema } from '@/lib/schemas/MessageSchema';
 import { ActionResult, MessageDto } from '@/types';
 import { getAuthUserId } from './authActions';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 import { mapMessageToMessageDto } from '@/lib/mappings';
 import { pusherServer } from '@/lib/pusher';
 import { createChatId } from '@/lib/util';
@@ -33,7 +34,11 @@ export async function createMessage(recipientUserId: string, data: MessageSchema
 
         return { status: 'success', data: messageDto };
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to create message', error as Error, {
+            userId,
+            recipientUserId,
+            textLength: data.text?.length
+        });
         return { status: 'error', error: 'Something went wrong' }
     }
 }
@@ -88,7 +93,10 @@ export async function getMessageThread(recipientId: string) {
 
         return { messages: messages.map(message => mapMessageToMessageDto(message)), readCount }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to get message thread', error as Error, {
+            userId,
+            recipientId
+        });
         throw error;
     }
 }
@@ -127,7 +135,12 @@ export async function getMessagesByContainer(container?: string | null, cursor?:
 
         return { messages: messagesToReturn, nextCursor }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to get messages by container', error as Error, {
+            userId,
+            container,
+            cursor,
+            limit
+        });
         throw error;
     }
 }
@@ -170,7 +183,11 @@ export async function deleteMessage(messageId: string, isOutbox: boolean) {
             })
         }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to delete message', error as Error, {
+            userId,
+            messageId,
+            isOutbox
+        });
         throw error;
     }
 }
@@ -187,7 +204,9 @@ export async function getUnreadMessageCount() {
             }
         })
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to get unread message count', error as Error, {
+            userId
+        });
         throw error;
     }
 }

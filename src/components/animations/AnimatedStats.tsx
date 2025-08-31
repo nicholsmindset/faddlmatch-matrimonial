@@ -3,14 +3,15 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { value: "1M+", label: "Active Users" },
-  { value: "500K", label: "Matches" },
-  { value: "4.8★", label: "Rating" },
+  { value: "100K+", label: "Active Singles" },
+  { value: "50K+", label: "Success Stories" },
+  { value: "4.8★", label: "App Store Rating" },
+  { value: "95%", label: "Match Success Rate" },
 ];
 
 export default function AnimatedStats() {
   return (
-    <div className="flex justify-center gap-12 mt-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12 max-w-4xl mx-auto">
       {stats.map((stat, index) => (
         <motion.div
           key={index}

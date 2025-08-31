@@ -3,11 +3,12 @@
 import { auth, signIn, signOut } from '@/auth';
 import { sendPasswordResetEmail, sendVerificationEmail } from '@/lib/mail';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 import { LoginSchema } from '@/lib/schemas/LoginSchema';
 import { combinedRegisterSchema, ProfileSchema, registerSchema, RegisterSchema } from '@/lib/schemas/RegisterSchema';
 import { generateToken, getTokenByToken } from '@/lib/tokens';
 import { ActionResult } from '@/types';
-import { TokenType, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
 
@@ -18,7 +19,7 @@ export async function signInUser(data: LoginSchema): Promise<ActionResult<string
         if (!existingUser || !existingUser.email) return { status: 'error', error: 'Invalid credentials' }
 
         if (!existingUser.emailVerified) {
-            const { token, email } = await generateToken(existingUser.email, TokenType.VERIFICATION);
+            const { token, email } = await generateToken(existingUser.email, 'VERIFICATION');
 
             await sendVerificationEmail(email, token)
 
@@ -33,7 +34,7 @@ export async function signInUser(data: LoginSchema): Promise<ActionResult<string
 
         return { status: 'success', data: 'Logged in' }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to sign in user', error as Error, { email: data.email });
         if (error instanceof AuthError) {
             switch (error.type) {
                 case 'CredentialsSignin':
@@ -87,13 +88,13 @@ export async function registerUser(data: RegisterSchema): Promise<ActionResult<U
             }
         })
 
-        const verificationToken = await generateToken(email, TokenType.VERIFICATION);
+        const verificationToken = await generateToken(email, 'VERIFICATION');
 
         await sendVerificationEmail(verificationToken.email, verificationToken.token)
 
         return { status: 'success', data: user }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to register user', error as Error, { email: data.email });
         return { status: 'error', error: 'Something went wrong' }
     }
 
@@ -129,7 +130,7 @@ export async function verifyEmail(token: string): Promise<ActionResult<string>> 
         return { status: 'success', data: 'Success' }
 
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to verify email', error as Error, { token });
         throw error;
     }
 }
@@ -142,13 +143,13 @@ export async function generateResetPasswordEmail(email: string): Promise<ActionR
             return { status: 'error', error: 'Email not found' }
         }
 
-        const token = await generateToken(email, TokenType.PASSWORD_RESET);
+        const token = await generateToken(email, 'PASSWORD_RESET');
 
         await sendPasswordResetEmail(token.email, token.token);
 
         return { status: 'success', data: 'Password reset email has been sent.  Please check your emails' }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to generate reset password email', error as Error, { email });
         return { status: 'error', error: 'Something went wrong' }
     }
 }
@@ -205,7 +206,7 @@ export async function resetPassword(password: string, token: string | null): Pro
 
         return { status: 'success', data: 'Password updated successfully.  Please try logging in' }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to reset password', error as Error, { token });
         return { status: 'error', error: 'Something went wrong' }
     }
 }
@@ -245,7 +246,9 @@ export async function completeSocialLoginProfile(data: ProfileSchema):
 
         return { status: 'success', data: user.accounts[0].provider }
     } catch (error) {
-        console.log(error);
+        logger.error('Failed to complete social login profile', error as Error, {
+            userId: session.user.id
+        });
         throw error;
     }
 }

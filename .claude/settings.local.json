@@ -3,7 +3,22 @@
     "allow": [
       "mcp__ide__executeCode",
       "mcp__byterover-mcp__byterover-store-knowledge",
-      "mcp__byterover-mcp__byterover-retrive-knowledge"
+      "mcp__byterover-mcp__byterover-retrive-knowledge",
+      "Bash(npm install)",
+      "Bash(npm cache clean:*)",
+      "Bash(npm install:*)",
+      "Bash(chmod:*)",
+      "Bash(docker network:*)",
+      "Bash(docker:*)",
+      "Bash(npm run dev:*)",
+      "Bash(postgres:15-alpine)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma migrate dev --name init)",
+      "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma db seed)",
+      "Bash(pkill:*)",
+      "Bash(cd:*)",
+      "Bash(git add:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
