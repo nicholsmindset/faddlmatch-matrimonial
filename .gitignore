@@ -26,4 +26,11 @@ yarn-error.log*
 .vercel
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+next-env.d.tsnode_modules/
+.next/
+*.log
+.env.local
+prisma/dev.db
+.DS_Store
+dist/
+build/

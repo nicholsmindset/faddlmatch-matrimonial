@@ -18,7 +18,11 @@
       "Bash(DATABASE_URL=\"file:./dev.db\" npx prisma db seed)",
       "Bash(pkill:*)",
       "Bash(cd:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git remote remove:*)",
+      "Bash(git remote add:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
